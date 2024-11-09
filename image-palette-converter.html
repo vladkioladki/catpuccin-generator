@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Catppuccin Mocha Image Converter</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            background: #1e1e2e;
+            color: #cdd6f4;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        canvas {
+            max-width: 100%;
+            height: auto;
+            border: 2px solid #313244;
+            border-radius: 8px;
+        }
+        
+        button {
+            background: #89b4fa;
+            color: #1e1e2e;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        button:hover {
+            background: #b4befe;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .upload-btn {
+            background: #cba6f7;
+            color: #1e1e2e;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .upload-btn:hover {
+            background: #f5c2e7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Catppuccin Mocha Image Converter</h1>
+        <label class="upload-btn" for="fileInput">
+            Выберите изображение
+        </label>
+        <input type="file" id="fileInput" accept="image/*">
+        <div id="canvasContainer" style="display: none;">
+            <canvas id="originalCanvas"></canvas>
+            <button onclick="convertToCatppuccin()">Конвертировать в Catppuccin</button>
+            <canvas id="convertedCanvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Палитра Catppuccin Mocha
+        const catppuccinPalette = {
+            rosewater: [245, 224, 220],
+            flamingo: [242, 205, 205],
+            pink: [245, 194, 231],
+            mauve: [203, 166, 247],
+            red: [243, 139, 168],
+            maroon: [235, 160, 172],
+            peach: [250, 179, 135],
+            yellow: [249, 226, 175],
+            green: [166, 227, 161],
+            teal: [148, 226, 213],
+            sky: [137, 220, 235],
+            sapphire: [116, 199, 236],
+            blue: [137, 180, 250],
+            lavender: [180, 190, 254],
+            text: [205, 214, 244],
+            subtext1: [186, 194, 222],
+            subtext0: [166, 173, 200],
+            overlay2: [147, 153, 178],
+            overlay1: [127, 132, 156],
+            overlay0: [108, 112, 134],
+            surface2: [88, 91, 112],
+            surface1: [69, 71, 90],
+            surface0: [49, 50, 68],
+            base: [30, 30, 46],
+            mantle: [24, 24, 37],
+            crust: [17, 17, 27]
+        };
+
+        function findClosestColor(r, g, b) {
+            let minDistance = Infinity;
+            let closestColor = null;
+
+            for (let [_, color] of Object.entries(catppuccinPalette)) {
+                const dr = r - color[0];
+                const dg = g - color[1];
+                const db = b - color[2];
+                const distance = dr * dr + dg * dg + db * db;
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestColor = color;
+                }
+            }
+
+            return closestColor;
+        }
+
+        function convertToCatppuccin() {
+            const originalCanvas = document.getElementById('originalCanvas');
+            const convertedCanvas = document.getElementById('convertedCanvas');
+            const ctx = convertedCanvas.getContext('2d');
+
+            convertedCanvas.width = originalCanvas.width;
+            convertedCanvas.height = originalCanvas.height;
+
+            const imageData = originalCanvas.getContext('2d').getImageData(
+                0, 0, originalCanvas.width, originalCanvas.height
+            );
+            const data = imageData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+                const closestColor = findClosestColor(data[i], data[i + 1], data[i + 2]);
+                data[i] = closestColor[0];
+                data[i + 1] = closestColor[1];
+                data[i + 2] = closestColor[2];
+            }
+
+            ctx.putImageData(imageData, 0, 0);
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = new Image();
+                    img.onload = function() {
+                        const originalCanvas = document.getElementById('originalCanvas');
+                        const ctx = originalCanvas.getContext('2d');
+                        
+                        // Устанавливаем размер холста
+                        originalCanvas.width = img.width;
+                        originalCanvas.height = img.height;
+                        
+                        // Отрисовываем изображение
+                        ctx.drawImage(img, 0, 0);
+                        
+                        // Показываем контейнер с холстами
+                        document.getElementById('canvasContainer').style.display = 'flex';
+                        document.getElementById('canvasContainer').style.flexDirection = 'column';
+                        document.getElementById('canvasContainer').style.gap = '1rem';
+                        document.getElementById('canvasContainer').style.alignItems = 'center';
+                    };
+                    img.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+    </script>
+</body>
+</html>
