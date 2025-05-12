@@ -61,12 +61,12 @@
     <div class="container">
         <h1>Catppuccin Mocha Image Converter</h1>
         <label class="upload-btn" for="fileInput">
-            Выберите изображение
+            Select image
         </label>
         <input type="file" id="fileInput" accept="image/*">
         <div id="canvasContainer" style="display: none;">
             <canvas id="originalCanvas"></canvas>
-            <button onclick="convertToCatppuccin()">Конвертировать в Catppuccin</button>
+            <button onclick="convertToCatppuccin()">Convert</button>
             <canvas id="convertedCanvas"></canvas>
         </div>
     </div>
@@ -154,14 +154,14 @@
                         const originalCanvas = document.getElementById('originalCanvas');
                         const ctx = originalCanvas.getContext('2d');
                         
-                        // Устанавливаем размер холста
+                        
                         originalCanvas.width = img.width;
                         originalCanvas.height = img.height;
                         
-                        // Отрисовываем изображение
+                        
                         ctx.drawImage(img, 0, 0);
                         
-                        // Показываем контейнер с холстами
+                        
                         document.getElementById('canvasContainer').style.display = 'flex';
                         document.getElementById('canvasContainer').style.flexDirection = 'column';
                         document.getElementById('canvasContainer').style.gap = '1rem';
