@@ -1,2 +1,2 @@
-# catpuccingeneratorchatgpt
-converts images to catppuccin-mocha
+# Catppuccin-Gen
+converts images to catppuccin
